@@ -20,7 +20,54 @@
 //////////////////////////////////////////////////////////////////////////////////
 
 
-module top(
+module top
+(
+input sysclk,
+input comm_clk,
 
-    );
+input txe,
+
+output [7:0] data,
+output wr
+
+);
+
+
+reg r_enable;
+reg r_reset;
+
+wire [7:0] w_data;
+wire w_wr;
+
+assign data = w_data;
+assign wr = w_wr;
+
+FT2232H_TX TX 
+(
+    .clk(comm_clk),
+    .txe(txe),
+    .data(8'b01010101),
+    .enable(r_enable),
+    .reset(r_reset),
+    .wr(w_wr),
+    .data_out(w_data)
+);
+
+reg clk_div = 1'b0;
+always @ ( posedge(sysclk) ) begin
+    clk_div <= ~clk_div;
+end
+
+always @ (clk_div) begin
+    if (clk_div == 1'b1) begin
+        r_enable <= 1'b1;
+        r_reset <= 1'b0;
+    end
+    else if (clk_div == 1'b0) begin
+        r_enable <= 1'b0;
+        r_reset <= 1'b1;
+    end
+
+end
+
 endmodule
