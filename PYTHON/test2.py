@@ -49,25 +49,25 @@ class FPGA:
 
         # Receive data
         chunks = []
-        #start_time = time()
+        start_time = time()
         while total_bytes > 0:
             chunk = self.ftdev.read(total_bytes,False)
-            print(self.ftdev.getQueueStatus())
-            print(chunk)
+            #print(self.ftdev.getQueueStatus())
+            #print(chunk)
             chunks.append(chunk)
             total_bytes -= len(chunk)
+        
 
         data = [b for chunk in chunks for b in chunk]
         data2 = [ord(c) for c in data] if type(data) is str else list(data)
-        print(data2)
-        #exec_time = time() - start_time
-
-        # Print statistics
-        #  # flatten all chunks
-        #data_len = len(data)
-        #data_len_mb = data_len / MiB
-        #print("Read %.02f MiB (%d bytes) from FPGA in %f seconds (%.02f MiB/s)" %
-        #      (data_len_mb, data_len, exec_time, data_len_mb / exec_time))
+        #print(data2)        
+        exec_time = time() - start_time
+            #Print statistics
+          # flatten all chunks
+        data_len = len(data)
+        data_len_mb = data_len / MiB
+        print("Read %.02f MiB (%d bytes) from FPGA in %f seconds (%.02f MiB/s)" %
+              (data_len_mb, data_len, exec_time, data_len_mb / exec_time))
 #
         ## Verify data
         #print("Verify data: %s" % ('ok' if golden_data == data else 'error'))
