@@ -52,6 +52,7 @@ end
 
 //reg [1:0] count = 0;
 reg [7:0] to_send = 'd69;
+reg [7:0] next_data = 0;
 //reg [7:0] to_send [3:0];
 //initial begin
 //    to_send[0] = 8'b00000001;
@@ -61,7 +62,7 @@ reg [7:0] to_send = 'd69;
 //end
 
 
-always @ ( posedge(clk)) begin //txe can go high while clk is low
+always @ ( posedge clk) begin //txe can go high while clk is low
     
     if (clk & ~txe) begin
             //count <= count + 1'b1;
@@ -76,7 +77,7 @@ always @ ( posedge(clk)) begin //txe can go high while clk is low
             end
             else begin
                 r_wr <= 1'b1;
-                data_out <= 8'b0;
+                data_out <= next_data;
             end
         end
 
@@ -88,7 +89,7 @@ always @ ( posedge(clk)) begin //txe can go high while clk is low
             end
             else begin
                 r_wr <= 1'b1;
-                data_out <= 8'b0;
+                next_data <= 8'b0;
                 state <= IDLE;
             end
         end

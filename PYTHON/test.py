@@ -12,15 +12,16 @@ BLOCK_LEN = 2048 * 32
 def init():
     dev = ftd2xx.openEx(b'FT73YTN0A')
     sleep(0.1)
-    dev.setTimeouts(5000, 5000)
+    dev.setTimeouts(500, 500)
     sleep(0.1)
     dev.setBitMode(0xff, 0x00)
     sleep(0.1)
     dev.setBitMode(0xff, 0x40)
     sleep(0.1)
     dev.setUSBParameters(0x10000, 0x10000)
+    #dev.setUSBParameters(0x00040, 0x00040)
     sleep(0.1)
-    dev.setLatencyTimer(2)
+    dev.setLatencyTimer(5)
     sleep(0.1)
     dev.setFlowControl(ftd2xx.defines.FLOW_RTS_CTS, 0, 0)
     sleep(0.1)
@@ -91,23 +92,32 @@ def parseHex(hexDump):
 
 
 if __name__ == "__main__":
-    testReturn = run_write_test(65523)
+    testReturn = run_write_test(63448)
     testReturnParsed = parseHex(testReturn)
     old_num = 0
-    
+    old_num2 = 0
     statData = []
+    errorCount = 0
 
     for i,num in enumerate(testReturnParsed):
-        if (num-1==old_num):
+        if (num-1==old_num or num-2 == old_num2 or num == 0):
             print(f"{i+1}: {num}")
             statData.append(0)
         else:
             print(f"{i+1}: {num} ----------------ERROR------")
             statData.append(10)
+            errorCount += 1
         
+        old_num2 = old_num
         old_num = num
+        
+    print(f"Test finished with {errorCount} errors")
+
 
     x = list(range(0,len(statData)))
 
     plt.plot(x, statData)
     plt.show()
+
+#USB Param = 64bytes, 7549 errors
+#USB Param = 64Kbytes, 7629 errors    
