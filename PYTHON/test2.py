@@ -24,7 +24,7 @@ class FPGA:
         # AN130 for more details about commands below
         self.ftdev.setBitMode(0xff, 0x40 if self.fifo245_mode == 'sync' else 0x00)
         self.ftdev.setTimeouts(10, 10)  # in ms
-        self.ftdev.setUSBParameters(5)  # set rx, tx buffer size in bytes
+        self.ftdev.setUSBParameters(0x10000)  # set rx, tx buffer size in bytes
         self.ftdev.setFlowControl(ft.defines.FLOW_RTS_CTS, 0, 0)
         return self
 
@@ -51,9 +51,10 @@ class FPGA:
         chunks = []
         start_time = time()
         while total_bytes > 0:
+            print(self.ftdev.getQueueStatus())
             chunk = self.ftdev.read(total_bytes,False)
-            #print(self.ftdev.getQueueStatus())
-            #print(chunk)
+            if not chunk:
+                break
             chunks.append(chunk)
             total_bytes -= len(chunk)
         
@@ -62,6 +63,7 @@ class FPGA:
         data2 = [ord(c) for c in data] if type(data) is str else list(data)
         #print(data2)        
         exec_time = time() - start_time
+        
             #Print statistics
           # flatten all chunks
         data_len = len(data)
@@ -71,36 +73,6 @@ class FPGA:
 #
         ## Verify data
         #print("Verify data: %s" % ('ok' if golden_data == data else 'error'))
-
-    def test_write(self, total_bytes=1 * MiB):
-        # Prepare data
-        data = bytes(bytearray([i % 256 for i in range(total_bytes)]))
-
-        # Start write test
-        self.ftdev.write(self.__cmd(0xCAFE, total_bytes - 1))
-
-        # Transmit data
-        offset = 0
-        data_len = total_bytes
-        result = 0
-        start_time = time()
-        while data_len > 0:
-            chunk_len = 1 * MiB if data_len > 1 * MiB else data_len
-            chunk_len = self.ftdev.write(data[offset:offset + chunk_len])
-            data_len -= chunk_len
-            offset += chunk_len
-        result = self.ftdev.read(1)
-        exec_time = time() - start_time
-
-        # Print statistics
-        data_len_mb = total_bytes / MiB
-        print("Wrote %.02f MiB (%d bytes) to FPGA in %f seconds (%.02f MiB/s)" %
-              (data_len_mb, total_bytes, exec_time, data_len_mb / exec_time))
-
-        # Verify data
-        result = 0 if not result else result[0]
-        print("Verify data: %s" % ('ok' if result == 0x42 else 'error'))
-
 
 with FPGA(ftdi_serial=b'FT73YTN0A', fifo245_mode='sync') as de10lite:
     print("START")

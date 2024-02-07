@@ -51,7 +51,7 @@ initial begin
 end
 
 //reg [1:0] count = 0;
-reg [7:0] to_send = 'd69;
+reg [7:0] to_send = 'd0;
 reg [7:0] next_data = 0;
 //reg [7:0] to_send [3:0];
 //initial begin
@@ -60,13 +60,23 @@ reg [7:0] next_data = 0;
 //    to_send[2] = 8'b00000100;
 //    to_send[3] = 8'b00001000;
 //end
-
+//always @ (negedge clk) begin
+//    if (~clk & ~txe & ~r_wr) begin
+//        //count <= count + 1'b1;
+//        to_send <= to_send + 1'b1;
+//    end
+//end
 
 always @ ( posedge clk) begin //txe can go high while clk is low
     
-    if (clk & ~txe) begin
-            //count <= count + 1'b1;
-            to_send <= to_send + 1'b1;
+    //if (clk & ~txe & ~r_wr) begin
+    //        //count <= count + 1'b1;
+    //        to_send <= to_send + 1'b1;
+    //end
+
+    if(txe) begin
+        state <= IDLE;
+        r_wr <= 1'b1;
     end
 
     case(state) 
@@ -83,13 +93,14 @@ always @ ( posedge clk) begin //txe can go high while clk is low
 
         SEND:begin
             if(~txe) begin
+                to_send <= to_send + 1'b1;
                 data_out <= to_send;
-                
                 r_wr <= 1'b0;
             end
             else begin
+                to_send <= to_send - 1'b1;
                 r_wr <= 1'b1;
-                next_data <= 8'b0;
+                next_data <= to_send+1;
                 state <= IDLE;
             end
         end

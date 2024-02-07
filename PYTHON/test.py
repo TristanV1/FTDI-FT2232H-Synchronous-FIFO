@@ -12,7 +12,7 @@ BLOCK_LEN = 2048 * 32
 def init():
     dev = ftd2xx.openEx(b'FT73YTN0A')
     sleep(0.1)
-    dev.setTimeouts(500, 500)
+    dev.setTimeouts(10, 10)
     sleep(0.1)
     dev.setBitMode(0xff, 0x00)
     sleep(0.1)
@@ -21,7 +21,7 @@ def init():
     dev.setUSBParameters(0x10000, 0x10000)
     #dev.setUSBParameters(0x00040, 0x00040)
     sleep(0.1)
-    dev.setLatencyTimer(5)
+    dev.setLatencyTimer(1)
     sleep(0.1)
     dev.setFlowControl(ftd2xx.defines.FLOW_RTS_CTS, 0, 0)
     sleep(0.1)
@@ -46,7 +46,9 @@ def run_write_test(bytesToRead):
     data = [i % 256 for i in range(numBytes)]
 
     print("\n \n")
+    print(f"In Buffer Before Purge: {dev.getQueueStatus()}")
     dev.purge(ftd2xx.defines.PURGE_RX)
+    print(f"In Buffer After Purge: {dev.getQueueStatus()}")
     sleep(0.1)
     #print(dev.getQueueStatus())
 
@@ -57,12 +59,23 @@ def run_write_test(bytesToRead):
     #print (start_time)
 
     chunks = []
-    while numBytes > 0:
-        chunk = dev.read(numBytes,True)
-        #print(chunk)
-        #print(dev.getQueueStatus())
-        chunks.append(chunk)
-        numBytes -= len(chunk)
+    bytesLeft = bytesToRead
+    read1 = 0
+    if dev.getQueueStatus() > 0:
+        while bytesLeft > 0:
+            if read1%510 >= 1:
+                sleep(0.0001)
+                print ("Break")
+                print(read1)
+            chunk = dev.read(bytesLeft,True)
+            if not chunk:
+                break
+            chunks.append(chunk)
+            read = len(chunk)
+            bytesLeft -= len(chunk)
+            print(bytesLeft)
+    else:
+        print("Buffer empty, no data read.")
 
     end_time = time_ns()-start_time
     #print(time_ns())
@@ -92,7 +105,7 @@ def parseHex(hexDump):
 
 
 if __name__ == "__main__":
-    testReturn = run_write_test(63448)
+    testReturn = run_write_test(0x01000)
     testReturnParsed = parseHex(testReturn)
     old_num = 0
     old_num2 = 0
@@ -100,12 +113,12 @@ if __name__ == "__main__":
     errorCount = 0
 
     for i,num in enumerate(testReturnParsed):
-        if (num-1==old_num or num-2 == old_num2 or num == 0):
+        if (num-1==old_num or num-2 == old_num2 or num == 0 or i == 0):
             print(f"{i+1}: {num}")
             statData.append(0)
         else:
             print(f"{i+1}: {num} ----------------ERROR------")
-            statData.append(10)
+            statData.append(1)
             errorCount += 1
         
         old_num2 = old_num
@@ -117,7 +130,10 @@ if __name__ == "__main__":
     x = list(range(0,len(statData)))
 
     plt.plot(x, statData)
+    plt.xlabel("Data Address")
+    plt.ylabel("Error?")
     plt.show()
+    
 
 #USB Param = 64bytes, 7549 errors
 #USB Param = 64Kbytes, 7629 errors    

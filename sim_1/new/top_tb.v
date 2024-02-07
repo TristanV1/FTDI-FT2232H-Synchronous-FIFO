@@ -51,7 +51,7 @@ initial begin
             sysclk <= ~sysclk;
         end
 
-        if(i % 100 == 0) begin
+        if(i % ($random%25) == 0) begin
             txe <= ~txe;
         end
         #10;
