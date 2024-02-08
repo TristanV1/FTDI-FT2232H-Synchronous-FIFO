@@ -31,7 +31,7 @@ def init():
     sleep(0.1)
     return dev
 
-def run_write_test(bytesToRead):
+def run_write_test(bytesToRead = 0, getBitRate = False):
     dev = init()
     print("\nDevice Details :")
     print("Serial : " , dev.getDeviceInfo()['serial'])
@@ -55,48 +55,45 @@ def run_write_test(bytesToRead):
     #rx_data = dev.read(numBytes,True) 
     #print(dev.getQueueStatus())
     
-    start_time = time_ns()
+    
     #print (start_time)
 
     chunks = []
     bytesLeft = bytesToRead
-    read1 = 0
+    print(f"Reading {numBytes} Bytes")
+
+    start_time = time_ns()
     if dev.getQueueStatus() > 0:
         while bytesLeft > 0:
-            if read1%510 >= 1:
-                sleep(0.0001)
-                print ("Break")
-                print(read1)
             chunk = dev.read(bytesLeft,True)
             if not chunk:
                 break
             chunks.append(chunk)
-            read = len(chunk)
             bytesLeft -= len(chunk)
-            print(bytesLeft)
+            #print(bytesLeft)
     else:
         print("Buffer empty, no data read.")
 
-    end_time = time_ns()-start_time
-    #print(time_ns())
-
     combine_chunks = [b for chunk in chunks for b in chunk]
-    run_time_s = end_time*float(10.0**-9)
-
-    print(f"Run Time: {run_time_s}")
     
-    #bit_rate = float(len(combine_chunks)) / run_time_s
-    #print("Bit rate: (%.06f Mbps)" % (bit_rate*(10.0**-6)))
+    end_time0 = time_ns()
+    if (getBitRate):
+        end_time = end_time0 - start_time
 
-    #print(f"Bit rate: {float(numBytes*8)/float(end_time)}Mbps")
+        run_time_s = end_time*float(10.0**-9)
 
-    #print(f"Reading {numBytes} Bytes")
-    #print(rx_data)
+        print(f"Run Time: {run_time_s}")
+
+        bit_rate = float(len(combine_chunks)) / run_time_s
+        print("Bit rate: (%.06f Mbps)" % (bit_rate*(10.0**-6)))
+    else:
+        bit_rate = 0
+
 
     dev.close()
     print("\nWrite Test Finished Successfully\n")
 
-    return(combine_chunks)
+    return(combine_chunks,bit_rate*(10.0**-6))
 
 def parseHex(hexDump):
     return([ord(c) for c in hexDump] if type(hexDump) is str else list(hexDump))
@@ -105,7 +102,8 @@ def parseHex(hexDump):
 
 
 if __name__ == "__main__":
-    testReturn = run_write_test(0x01000)
+    getBitRate = True
+    testReturn,bit_rate = run_write_test(0x00100000,getBitRate)
     testReturnParsed = parseHex(testReturn)
     old_num = 0
     old_num2 = 0
@@ -114,17 +112,20 @@ if __name__ == "__main__":
 
     for i,num in enumerate(testReturnParsed):
         if (num-1==old_num or num-2 == old_num2 or num == 0 or i == 0):
-            print(f"{i+1}: {num}")
+            #print(f"{i+1}: {num}")
             statData.append(0)
         else:
-            print(f"{i+1}: {num} ----------------ERROR------")
+            #print(f"{i+1}: {num} ----------------ERROR------")
             statData.append(1)
             errorCount += 1
         
         old_num2 = old_num
         old_num = num
-        
+
     print(f"Test finished with {errorCount} errors")
+    if (getBitRate):
+        print(f"Achieved {round(bit_rate,2)} Mbps")
+        print(f"         {round(bit_rate/8,2)} MBps")
 
 
     x = list(range(0,len(statData)))
