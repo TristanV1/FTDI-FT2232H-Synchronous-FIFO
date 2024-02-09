@@ -29,6 +29,7 @@ input txe,
 
 output [7:0] data,
 output wr,
+output rd,
 output siwu,
 output oe_n
 );
@@ -50,11 +51,16 @@ initial begin
     r_oe_n <= 1'b1;
 end
 
+reg r_rd;
+initial begin
+    r_rd <= 1'b1;
+end
 
 assign data = w_data;
 assign wr = w_wr;
 assign siwu = r_siwu;
 assign oe_n = r_oe_n;
+assign rd = r_rd;
 
 FT2232H_TX TX 
 (
@@ -67,21 +73,5 @@ FT2232H_TX TX
     .data_out(w_data)
 );
 
-//reg clk_div = 1'b0;
-//always @ ( posedge(sysclk) ) begin
-//    clk_div <= ~clk_div;
-//end
-//
-//always @ (clk_div) begin
-//    if (clk_div == 1'b1) begin
-//        r_enable <= 1'b1;
-//        r_reset <= 1'b0;
-//    end
-//    else if (clk_div == 1'b0) begin
-//        r_enable <= 1'b0;
-//        r_reset <= 1'b1;
-//    end
-//
-//end
 
 endmodule

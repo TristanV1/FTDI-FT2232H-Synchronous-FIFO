@@ -29,6 +29,7 @@ reg sysclk   = 0,
 
 wire [7:0] data; //output data (to FT2232)
 wire wr; //write ready signal (to FT2232)
+wire rd;
 
 top tb
 (
@@ -36,12 +37,14 @@ top tb
 .comm_clk(comm_clk),
 .txe(txe),
 .data(data),
-.wr(wr)
+.wr(wr),
+.rd(rd)
 
 );
 
 integer i;
 initial begin
+    txe <= 0;
     for (i=0; i<100000; i = i+1) begin
         if(i % 1 == 0) begin
             comm_clk <= ~comm_clk;
@@ -50,10 +53,15 @@ initial begin
         if(i % 5 == 0) begin
             sysclk <= ~sysclk;
         end
-
-        if(i % ($random%25) == 0) begin
-            txe <= ~txe;
+        
+        if(i % (1020) == 0) begin
+            txe <= 1;
         end
+
+        if(i % (1022) == 0) begin
+            txe <= 0;
+        end
+
         #10;
     end
 end
