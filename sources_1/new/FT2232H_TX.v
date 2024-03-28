@@ -57,9 +57,9 @@ always @ ( posedge clk) begin //txe can go high while clk is low
                 r_wr <= 1'b0;
             end
             else begin
-                to_send <= to_send - 1'b1;
+                //to_send <= to_send - 1'b1;
                 r_wr <= 1'b1;
-                next_data <= to_send+1;
+                next_data <= to_send;
                 state <= IDLE;
             end
         end

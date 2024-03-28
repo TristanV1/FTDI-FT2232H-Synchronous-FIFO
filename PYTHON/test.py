@@ -18,7 +18,7 @@ def init():
     sleep(0.1)
     dev.setBitMode(0xff, 0x40)
     sleep(0.1)
-    dev.setUSBParameters(0x0000FA0, 0x0000FA0)
+    dev.setUSBParameters(0x0001000, 0x0001000)
     #dev.setUSBParameters(0x00040, 0x00040)
     sleep(0.1)
     dev.setLatencyTimer(2)
@@ -95,7 +95,7 @@ def parseHex(hexDump):
 
 
 def testbench(getBitRate = False,printErrors = False,writeToLog = False,getStats = True,getPlot = False):
-    testReturn,bit_rate = run_write_test(0x0003200,getBitRate)
+    testReturn,bit_rate = run_write_test(0x0010000,getBitRate)
     testReturnParsed = parseHex(testReturn)
     old_num = 0
     old_num2 = 0
@@ -146,12 +146,13 @@ if __name__ == "__main__":
     isError = False
     run = 0
     Errors = 0
+    testbench(getStats = True, printErrors=True,getPlot = True)
 
-    while(not isError):
-        run += 1
-        Errors = testbench(getStats = True, printErrors=False) >= 1
-        isError = Errors >= 1
-        print(run)
+    #while(not isError):
+    #    run += 1
+    #    Errors = testbench(getStats = True, printErrors=False)
+    #    isError = Errors >= 1
+    #    print(run)
 
     print(f"{run} runs until error. \nTotal Errors: {Errors}")
     
