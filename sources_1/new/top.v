@@ -30,6 +30,7 @@ input txe,
 output [7:0] data,
 output wr,
 output rd,
+
 output siwu,
 output oe_n
 );

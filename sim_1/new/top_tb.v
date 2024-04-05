@@ -54,13 +54,13 @@ initial begin
             sysclk <= ~sysclk;
         end
         
-        if(i % (1020) == 0) begin
-            txe <= 1;
+        if(i % ($random%5) == 0) begin
+            txe <= ~txe;
         end
 
-        if(i % (1022) == 0) begin
-            txe <= 0;
-        end
+        //if(i % ($random%5) == 0) begin
+        //    txe <= 0;
+        //end
 
         #10;
     end
