@@ -18,10 +18,10 @@ def init():
     sleep(0.1)
     dev.setBitMode(0xff, 0x40)
     sleep(0.1)
-    dev.setUSBParameters(0x0010000, 0x0010000)
+    dev.setUSBParameters(0x000000010, 0x000000010)
     #dev.setUSBParameters(0x00040, 0x00040)
     sleep(0.1)
-    dev.setLatencyTimer(2)
+    dev.setLatencyTimer(16)
     sleep(0.1)
     dev.setFlowControl(ftd2xx.defines.FLOW_RTS_CTS, 0, 0)
     sleep(0.1)
@@ -97,7 +97,7 @@ def parseHex(hexDump):
 
 
 def testbench(getBitRate = False,printErrors = False,writeToLog = False,getStats = True,getPlot = False):
-    testReturn,bit_rate = run_write_test(0x0010000,getBitRate)
+    testReturn,bit_rate = run_write_test(0x00001000,getBitRate)
     testReturnParsed = parseHex(testReturn)
     old_num = 0
     old_num2 = 0
@@ -107,7 +107,7 @@ def testbench(getBitRate = False,printErrors = False,writeToLog = False,getStats
     log = open("log.txt","a")
 
     for i,num in enumerate(testReturnParsed):
-        if (num-1==old_num or num-2 == old_num2 or num == 0 or i == 0 or (num == 255 and old_num == 254)):
+        if (num-1==old_num or num-2 == old_num2 or num == 0 or i == 0 or (num == 255 and old_num == 254) or num == 1):
             if (printErrors):
                 print(f"{i+1}: {num}")
             if (writeToLog):
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     isError = False
     run = 0
     Errors = 0
-    testbench(getStats = True, printErrors=True,getPlot = True,writeToLog = True)
+    testbench(getBitRate = False,getStats = False, printErrors=True,getPlot = True,writeToLog = False)
 
     #while(not isError):
     #    run += 1
