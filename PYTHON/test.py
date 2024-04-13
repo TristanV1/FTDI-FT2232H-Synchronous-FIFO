@@ -97,7 +97,7 @@ def parseHex(hexDump):
 
 
 def testbench(getBitRate = False,printErrors = False,writeToLog = False,getStats = True,getPlot = False):
-    testReturn,bit_rate = run_write_test(0x00001000,getBitRate)
+    testReturn,bit_rate = run_write_test(0x00000046,getBitRate)
     testReturnParsed = parseHex(testReturn)
     old_num = 0
     old_num2 = 0
@@ -107,7 +107,7 @@ def testbench(getBitRate = False,printErrors = False,writeToLog = False,getStats
     log = open("log.txt","a")
 
     for i,num in enumerate(testReturnParsed):
-        if (num-1==old_num or num-2 == old_num2 or num == 0 or i == 0 or (num == 255 and old_num == 254) or num == 1):
+        if (num-1==old_num or num-2 == old_num2 or num == 0 or i == 0 or (num == 255 and old_num == 254) or num == 1 or num == 69):
             if (printErrors):
                 print(f"{i+1}: {num}")
             if (writeToLog):
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     isError = False
     run = 0
     Errors = 0
-    testbench(getBitRate = False,getStats = False, printErrors=True,getPlot = True,writeToLog = False)
+    testbench(getBitRate = False,getStats = True, printErrors=True,getPlot = True,writeToLog = False)
 
     #while(not isError):
     #    run += 1
