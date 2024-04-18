@@ -97,7 +97,7 @@ def parseHex(hexDump):
 
 
 def testbench(getBitRate = False,printErrors = False,writeToLog = False,getStats = True,getPlot = False):
-    testReturn,bit_rate = run_write_test(0x00010000,getBitRate)
+    testReturn,bit_rate = run_write_test(0x00001000,getBitRate)
     testReturnParsed = parseHex(testReturn)
     old_num = 0
     old_num2 = 0
@@ -148,7 +148,7 @@ if __name__ == "__main__":
     isError = False
     run = 0
     Errors = 0
-    testbench(getBitRate = True,getStats = True, printErrors=False,getPlot = False,writeToLog = False)
+    testbench(getBitRate = False,getStats = True, printErrors=True,getPlot = False,writeToLog = False)
 
     #while(not isError):
     #    run += 1
