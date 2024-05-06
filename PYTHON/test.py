@@ -12,7 +12,7 @@ BLOCK_LEN = 2048 * 32
 def init():
     dev = ftd2xx.openEx(b'FT73YTN0A')
     sleep(0.1)
-    dev.setTimeouts(500, 500)
+    dev.setTimeouts(5000, 5000)
     sleep(0.1)
     dev.setBitMode(0xff, 0x00)
     sleep(0.1)
@@ -148,7 +148,9 @@ if __name__ == "__main__":
     isError = False
     run = 0
     Errors = 0
-    testbench(getBitRate = False,getStats = True, printErrors=True,getPlot = False,writeToLog = False)
+
+    while True:
+        testbench(getBitRate = False,getStats = True, printErrors=True,getPlot = False,writeToLog = False)
 
     #while(not isError):
     #    run += 1

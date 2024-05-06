@@ -24,7 +24,7 @@ module top
 (
 input sysclk,
 input comm_clk,
-
+input enable,
 input txe,
 
 output [7:0] data,
@@ -70,7 +70,7 @@ FT2232H_TX TX
     .clk(comm_clk),
     .txe(txe),
     .data(r_data),
-    //.enable(r_enable),
+    .enable(enable),
     //.reset(r_reset),
     .wr(w_wr),
     .data_out(w_data)

@@ -8,7 +8,7 @@ set_property -dict { PACKAGE_PIN M9    IOSTANDARD LVCMOS33 } [get_ports { sysclk
 create_clock -add -name sys_clk_pin -period 83.33 -waveform {0 41.66} [get_ports { sysclk }];
 
 ## Push Buttons
-#set_property -dict { PACKAGE_PIN D2    IOSTANDARD LVCMOS33 } [get_ports { rst }]; #IO_L6P_T0_34 Sch=btn[0]
+set_property -dict { PACKAGE_PIN D2    IOSTANDARD LVCMOS33 } [get_ports { enable }]; #IO_L6P_T0_34 Sch=btn[0]
 #set_property -dict { PACKAGE_PIN D1    IOSTANDARD LVCMOS33 } [get_ports { btn[1] }]; #IO_L6N_T0_VREF_34 Sch=btn[1]
 
 ## RGB LEDs
